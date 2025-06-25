@@ -1,161 +1,189 @@
-# Portal do Método VAP
+# Portal Educacional - Método VAP
 
-Este é o código-fonte completo do Portal do Método VAP, desenvolvido com React Native Expo e Expo Router.
+Portal completo para o curso "O Método VAP - Vendedor de Alta Performance" desenvolvido com Next.js, Tailwind CSS e Supabase.
 
-## 🚀 Como executar o projeto
+## 🚀 Funcionalidades
 
-### Pré-requisitos
-- Node.js (versão 18 ou superior)
-- npm ou yarn
+### ✅ Autenticação e Segurança
+- Sistema completo de login/registro com e-mail e senha
+- Autenticação via Supabase Auth
+- Proteção de rotas privadas
+- Perfis de usuário personalizados
 
-### Instalação
+### 📚 Sistema de Módulos
+- 11 módulos completos do curso Método VAP
+- Conteúdo em HTML estruturado e responsivo
+- Sistema de progressão sequencial (módulos bloqueados até conclusão do anterior)
+- Acompanhamento de tempo de estudo por módulo
+
+### 🎯 Dashboard Interativo
+- Visão geral do progresso do aluno
+- Estatísticas detalhadas (tempo estudado, módulos concluídos, nível, pontos)
+- Sistema de gamificação com conquistas
+- Interface moderna e responsiva
+
+### 🏆 Sistema de Gamificação
+- Pontos por módulo concluído (100 pontos cada)
+- Sistema de níveis baseado em pontos
+- Conquistas desbloqueáveis
+- Acompanhamento de tempo total de estudo
+
+### 🎨 Design Moderno
+- Interface inspirada em padrões Apple-level
+- Animações suaves com Framer Motion
+- Design responsivo para todos os dispositivos
+- Tema de cores profissional (azul/branco)
+
+## 🛠 Tecnologias Utilizadas
+
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **Styling**: Tailwind CSS
+- **Animações**: Framer Motion
+- **Banco de Dados**: Supabase (PostgreSQL)
+- **Autenticação**: Supabase Auth
+- **Notificações**: React Hot Toast
+- **Ícones**: Lucide React
+
+## 📋 Pré-requisitos
+
+- Node.js 18+ 
+- Conta no Supabase
+- Git
+
+## 🔧 Instalação e Configuração
+
+### 1. Clone o repositório
 ```bash
-# Clone o repositório
-git clone https://github.com/Cleverson128/ometodovap.git
+git clone <url-do-repositorio>
+cd portal-curso-metodo-vap
+```
 
-# Entre na pasta do projeto
-cd ometodovap
-
-# Instale as dependências
+### 2. Instale as dependências
+```bash
 npm install
+```
 
-# Execute o projeto
+### 3. Configure o Supabase
+
+1. Crie um novo projeto no [Supabase](https://supabase.com)
+2. Vá para Settings > API e copie:
+   - Project URL
+   - Anon public key
+   - Service role key (para operações administrativas)
+
+### 4. Configure as variáveis de ambiente
+
+Copie o arquivo `.env.example` para `.env.local`:
+```bash
+cp .env.example .env.local
+```
+
+Edite o arquivo `.env.local` com suas credenciais do Supabase:
+```env
+NEXT_PUBLIC_SUPABASE_URL=sua_url_do_supabase
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
+SUPABASE_SERVICE_ROLE_KEY=sua_chave_service_role
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 5. Execute as migrações do banco de dados
+
+No painel do Supabase, vá para SQL Editor e execute o conteúdo do arquivo:
+`supabase/migrations/create_initial_schema.sql`
+
+Isso criará:
+- Tabelas necessárias (users, course_modules, user_progress, user_stats)
+- Políticas de segurança (RLS)
+- Dados iniciais dos 11 módulos do curso
+
+### 6. Inicie o servidor de desenvolvimento
+```bash
 npm run dev
 ```
 
-O projeto estará disponível em `http://localhost:8081`
+Acesse [http://localhost:3000](http://localhost:3000) para ver o portal funcionando.
 
-## 📁 Estrutura do Projeto
+## 📊 Estrutura do Banco de Dados
 
-```
-/
-├── app/                    # Rotas da aplicação (Expo Router)
-│   ├── _layout.tsx        # Layout raiz
-│   ├── (tabs)/           # Navegação por abas
-│   │   ├── _layout.tsx   # Layout das abas
-│   │   ├── index.tsx     # Tela inicial/dashboard
-│   │   ├── modules.tsx   # Módulos do curso
-│   │   ├── progress.tsx  # Progresso do aluno
-│   │   └── profile.tsx   # Perfil do usuário
-│   └── +not-found.tsx    # Página 404
-├── components/            # Componentes reutilizáveis
-│   ├── ModuleCard.tsx    # Card de módulo
-│   ├── ProgressBar.tsx   # Barra de progresso
-│   └── StatsCard.tsx     # Card de estatísticas
-├── constants/            # Constantes e temas
-│   └── Theme.ts          # Tema da aplicação
-├── data/                 # Dados mockados (substituir por Supabase)
-│   └── courseData.ts     # Dados dos módulos e usuário
-└── hooks/                # Hooks customizados
-    └── useFrameworkReady.ts
-```
+### Tabelas Principais
 
-## 🔧 Integrações Necessárias
+1. **users** - Perfis dos usuários
+   - id, email, full_name, avatar_url, timestamps
 
-### 1. Supabase (Backend e Autenticação)
+2. **course_modules** - Módulos do curso
+   - id, title, description, content_html, order_index, is_active
 
-#### Tabelas necessárias:
-```sql
--- Usuários (usar auth.users do Supabase)
--- Progresso dos módulos
-CREATE TABLE user_progress (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id),
-  module_id INTEGER,
-  progress INTEGER DEFAULT 0,
-  completed BOOLEAN DEFAULT false,
-  completed_at TIMESTAMP,
-  created_at TIMESTAMP DEFAULT NOW()
-);
+3. **user_progress** - Progresso dos usuários
+   - user_id, module_id, completed, completed_at, time_spent
 
--- Estatísticas do usuário
-CREATE TABLE user_stats (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id),
-  total_watch_time INTEGER DEFAULT 0,
-  streak INTEGER DEFAULT 0,
-  level VARCHAR(50) DEFAULT 'Iniciante',
-  certificates INTEGER DEFAULT 0,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-#### Arquivos para modificar:
-- `data/courseData.ts` - Substituir dados mockados por chamadas ao Supabase
-- Criar `lib/supabase.ts` - Cliente do Supabase
-- Criar `contexts/AuthContext.tsx` - Contexto de autenticação
-
-### 2. Hotmart Integration
-
-#### Webhook endpoint necessário:
-- `app/api/hotmart-webhook+api.ts` - Receber notificações de compra
-- Liberar acesso ao usuário após confirmação de pagamento
-
-### 3. Autenticação
-
-#### Telas necessárias:
-- `app/auth/login.tsx` - Tela de login
-- `app/auth/register.tsx` - Tela de cadastro
-- `app/auth/forgot-password.tsx` - Recuperação de senha
-
-## 🎨 Design System
-
-O projeto usa um design system completo definido em `constants/Theme.ts`:
-- Cores personalizadas (dourado como cor primária)
-- Tipografia (Poppins)
-- Espaçamentos consistentes
-- Componentes reutilizáveis
-
-## 📱 Funcionalidades Implementadas
-
-### ✅ Já funcionando:
-- Dashboard com estatísticas do usuário
-- Lista de módulos com filtros e busca
-- Acompanhamento de progresso
-- Perfil do usuário com configurações
-- Design responsivo
-- Navegação por abas
-
-### 🔄 Para integrar:
-- Autenticação real (Supabase Auth)
-- Dados dinâmicos do banco
-- Upload de arquivos
-- Notificações push
-- Integração com Hotmart
+4. **user_stats** - Estatísticas e gamificação
+   - user_id, total_time_studied, modules_completed, achievements, level, points
 
 ## 🚀 Deploy
 
-### Netlify
-```bash
-# Build para produção
-npm run build:web
+### Netlify (Recomendado para Web)
 
-# Deploy automático via Git
-# Configure o domínio personalizado: portalcursovap.fipei.com.br
-```
+1. Conecte seu repositório ao Netlify
+2. Configure as variáveis de ambiente no painel do Netlify
+3. Deploy automático a cada push
 
-### Variáveis de Ambiente
-Criar arquivo `.env`:
-```
-EXPO_PUBLIC_SUPABASE_URL=sua_url_do_supabase
-EXPO_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
-EXPO_PUBLIC_HOTMART_WEBHOOK_SECRET=seu_secret_hotmart
-```
+### Vercel
 
-## 📞 Suporte
+1. Conecte seu repositório ao Vercel
+2. Configure as variáveis de ambiente
+3. Deploy automático
 
-Para dúvidas técnicas sobre a implementação:
-- Documentação do Expo: https://docs.expo.dev/
-- Documentação do Supabase: https://supabase.com/docs
-- Documentação do Hotmart: https://developers.hotmart.com/
+## 📱 Funcionalidades PWA
+
+O portal funciona como um Progressive Web App (PWA):
+- Instalável na tela inicial do dispositivo
+- Funciona offline (cache básico)
+- Ícones personalizados
+- Experiência similar a app nativo
+
+## 🎯 Módulos do Curso
+
+1. **MÓDULO 1** - O QUE É O MÉTODO VAP?
+2. **MÓDULO 2** - A MENTALIDADE DO VAP
+3. **MÓDULO 3** - VALOR E VENDA
+4. **MÓDULO 4** - LIDERANÇA EM VENDAS
+5. **MÓDULO 5** - METODOLOGIA DISC
+6. **MÓDULO 6** - NEUROVENDAS APLICADAS
+7. **MÓDULO 7** - COPYWRITING
+8. **MÓDULO 8** - AS ETAPAS DA VENDA
+9. **MÓDULO 9** - DOMINANDO OBJEÇÕES
+10. **MÓDULO 10** - INTELIGÊNCIA ARTIFICIAL NAS VENDAS
+11. **MÓDULO EXTRA** - VENDA CONSULTIVA
 
 ## 🔐 Segurança
 
-- Todas as rotas de API devem validar tokens JWT
-- Implementar Row Level Security (RLS) no Supabase
-- Validar webhooks do Hotmart com assinatura
+- Row Level Security (RLS) habilitado em todas as tabelas
+- Usuários só acessam seus próprios dados
+- Autenticação obrigatória para áreas privadas
+- Validação de dados no frontend e backend
+
+## 🎨 Personalização
+
+### Cores
+Edite o arquivo `tailwind.config.js` para personalizar as cores:
+- primary: Cor principal (azul)
+- secondary: Cor secundária (verde)
+- accent: Cor de destaque (amarelo)
+
+### Conteúdo dos Módulos
+Edite diretamente no banco de dados via Supabase Table Editor ou crie um painel administrativo.
+
+## 📞 Suporte
+
+Para dúvidas ou problemas:
+1. Verifique se todas as variáveis de ambiente estão configuradas
+2. Confirme se as migrações do banco foram executadas
+3. Verifique os logs do console para erros específicos
+
+## 📄 Licença
+
+Este projeto foi desenvolvido para uso educacional e comercial. Código-fonte 100% livre para personalização e uso.
 
 ---
 
-**Projeto pronto para integração e deploy em produção!**
+**Portal Método VAP** - Transformando vendedores em profissionais de alta performance! 🚀
