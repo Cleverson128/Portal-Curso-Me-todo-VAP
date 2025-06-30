@@ -66,7 +66,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-  
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -74,20 +73,24 @@ export default function DashboardPage() {
           transition={{ duration: 0.6 }}
           className="space-y-8"
         >
-          <ProgressOverview
-            completedModules={completedModules}
-            totalModules={totalModules}
-            progressPercentage={progressPercentage}
-            stats={stats}
-          />
+          {stats && (
+            <ProgressOverview
+              completedModules={completedModules}
+              totalModules={totalModules}
+              progressPercentage={progressPercentage}
+              stats={stats}
+            />
+          )}
 
-          <AchievementSection
-            modulesCompleted={completedModules}
-            achievements={stats?.achievements || []}
-          />
+          {stats && (
+            <AchievementSection
+              modulesCompleted={completedModules}
+              achievements={stats.achievements || []}
+            />
+          )}
 
           <div>
-            <h2 className="text-2xl font-bold mb-6">📚 Módulos do Curso</h2>
+            <h2 className="text-2xl font-bold mb-6 text-white">📚 Módulos do Curso</h2>
             <ModuleGrid modules={modules} progress={progress} />
           </div>
         </motion.div>
